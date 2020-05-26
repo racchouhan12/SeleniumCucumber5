@@ -62,6 +62,8 @@ For Appium installation:
  2. To run specific scenarios use command : run=@foo mvn clean test (For MAC)
     For Windows you might need to use
     1. set run=@foo and not @foo1 (will run scenarios annotated with @foo and will skip annotated with @foo1)
+        1. set run=@foo or @foo1 (will run scenarios annontated with @foo or @foo1)
+        2. set run=@foo and @foo1 (will run scenarios annontated with @foo and @foo1)     
     2. set platform=desktop //possible options: desktop, mobility (default: desktop)
     3. set subPlatform=android //possible options: android, ios required when platform = mobility (default: "")
     4. set deviceId=1234443 //required when platform is mobility (default: "")
