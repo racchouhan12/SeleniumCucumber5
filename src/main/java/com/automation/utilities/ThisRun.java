@@ -26,21 +26,22 @@ public class ThisRun {
     private ThisRun() {
         sessionState.clear();
         add(KEYS.PROJECT_PATH, System.getProperty("user.dir"));
-        add(KEYS.TEST_RESOURCES, getAsString("PROJECT_PATH")+"/src/test/resources");
-        add(KEYS.REPORT_PATH, getAsString("PROJECT_PATH")+"/reports");
-        add(KEYS.FEATURE_FILES_PATH, getAsString("PROJECT_PATH")+ "/src/test/java/com/test/automation/feature");
+        add(KEYS.TEST_RESOURCES, getAsString("PROJECT_PATH") + "/src/test/resources");
+        add(KEYS.REPORT_PATH, getAsString("PROJECT_PATH") + "/reports");
+        add(KEYS.FEATURE_FILES_PATH, getAsString("PROJECT_PATH") + "/src/test/java/com/test/automation/feature");
         add(KEYS.OS_NAME, System.getProperty("os.name"));
-        add(KEYS.PLATFORM, getPlatform());
+        /*add(KEYS.PLATFORM, getPlatform());
         add(KEYS.SUB_PLATFORM, getSubPlatform());
         add(KEYS.BROWSER, getBrowser());
         add(KEYS.DEVICE_ID, getDeviceID());
         add(KEYS.APPIUM_SERVER_STARTED, false);
-        add(KEYS.TAG, getTag());
+        add(KEYS.TAG, getTag());*/
     }
 
-    private String getTag() {
-        String tag = System.getenv("run");
+    /*private String getTag() {
+        String tag = System.getenv("tags");
         if (StringUtil.isStringEmpty(tag)) {
+            logger.warn("Setting default tags as @foo since no tags were set externally");
             tag = "@foo";
         } else {
             return tag.trim();
@@ -53,7 +54,7 @@ public class ThisRun {
         if (StringUtil.isStringEmpty(deviceID)) {
             deviceID = "";
         } else {
-            return deviceID.toLowerCase();
+            return deviceID;
         }
         return deviceID;
     }
@@ -61,6 +62,7 @@ public class ThisRun {
     private String getPlatform() {
         String platform = System.getenv("platform");
         if (StringUtil.isStringEmpty(platform)) {
+            logger.warn("Setting default platform as desktop since no platform were set externally");
             platform = ProjectConstants.PLATFORM_DESKTOP;
         } else {
             return platform.toLowerCase();
@@ -86,7 +88,7 @@ public class ThisRun {
             return browser.toLowerCase();
         }
         return browser;
-    }
+    }*/
 
     public void add(String key, Object value) {
         sessionState.put(key, value);
@@ -109,7 +111,7 @@ public class ThisRun {
     }
 
     public void waitFor(int seconds) {
-        try{
+        try {
             Thread.sleep(seconds * 1000);
         } catch (InterruptedException ex) {
             System.out.println(ex.getMessage());

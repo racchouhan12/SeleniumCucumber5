@@ -1,0 +1,28 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Suite1" verbose="1" data-provider-thread-count="3" preserve-order="true">
+    <parameter name="platform" value="desktop"/>
+   <!-- <listeners>
+        <listener class-name="com.litmus.testlisteners.TestListeners"/>
+    </listeners>-->
+    <test name="Chrome test">
+        <parameter name="browser" value="chrome"></parameter>
+        <parameter name="tags" value="@foo"></parameter>
+        <classes>
+            <class name="com.testautomation.test.stepdefinitions.Runners.TestRunner"/>
+        </classes>
+    </test>
+    <test name="FireFox Test">
+        <parameter name="browser" value="firefox"></parameter>
+        <parameter name="tags" value="@foo1"></parameter>
+        <classes>
+            <class name="com.testautomation.test.stepdefinitions.Runners.TestRunner"/>
+        </classes>
+    </test>
+    <test name="Edge Test">
+        <parameter name="browser" value="edge"></parameter>
+        <parameter name="tags" value="@foo1"></parameter>
+        <classes>
+            <class name="com.testautomation.test.stepdefinitions.Runners.TestRunner"/>
+        </classes>
+    </test>
+</suite>

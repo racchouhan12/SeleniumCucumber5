@@ -9,21 +9,23 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.InvalidArgumentException;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.ie.InternetExplorerOptions;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DriverUtils {
 
@@ -35,10 +37,6 @@ public class DriverUtils {
     private String browser;
     private String platform;
 
-   /* public DriverUtils(String browser) {
-        this.browser = browser;
-    }*/
-
     public DriverUtils(String platform, String browser) {
         this.platform = platform.toLowerCase();
         this.browser = browser.toLowerCase();
@@ -47,7 +45,35 @@ public class DriverUtils {
 
     private WebDriver instantiateChromeDriver() {
         WebDriverManager.chromedriver().setup();
-        driver = new ChromeDriver();
+        driver = new ChromeDriver(setWebChromeOptions());
+        driver.get(thisRun.getAsString(KEYS.APP_URL.toString()));
+        driver.manage().window().maximize();
+        return driver;
+    }
+
+
+    private ChromeOptions setWebChromeOptions() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.setExperimentalOption("useAutomationExtension", false);
+        //options.addArguments("--headless");
+        //options.addArguments("--window-size=1920,1080");
+        options.setPageLoadStrategy(PageLoadStrategy.NONE);
+        options.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
+        //options.addArguments("--disable-ipv6");
+        //options.addArguments("--whitelisted-ips=''");
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("credentials_enable_service", false);
+        prefs.put("profile.password_manager_enabled", false);
+
+        options.setExperimentalOption("prefs", prefs);
+        return options;
+    }
+
+    private WebDriver instantiateEdgeDriver() {
+        //WebDriverManager.edgedriver().setup(); https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
+        driver = new EdgeDriver();
         driver.get(thisRun.getAsString(KEYS.APP_URL.toString()));
         driver.manage().window().maximize();
         return driver;
@@ -82,19 +108,37 @@ public class DriverUtils {
         } catch (Exception e) {
             System.out.println("Error ocured!");
         }
-        WebDriverManager.iedriver().setup();
-        driver = new InternetExplorerDriver();
+        System.setProperty("webdriver.ie.driver", thisRun.getAsString(KEYS.TEST_RESOURCES.name()) + "/IEDriverServer.exe");//32 bit ie11
+        driver = new InternetExplorerDriver(ieCapabilities());
         driver.get(thisRun.getAsString(KEYS.APP_URL.toString()));
         driver.manage().window().maximize();
         return driver;
     }
 
+    private InternetExplorerOptions ieCapabilities() {
+        DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
+        capabilities.setCapability(CapabilityType.BROWSER_NAME, "internet explorer");
+        capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+        capabilities.setCapability("ignoreProtectedModeSettings", true);
+        capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+        InternetExplorerOptions options = new InternetExplorerOptions(capabilities);
+        return options;
+    }
+
     private WebDriver instantiateFireFoxDriver() {
         WebDriverManager.firefoxdriver().setup();
-        driver = new FirefoxDriver();
+        driver = new FirefoxDriver(setFirefoxOptions());
         driver.get(thisRun.getAsString(KEYS.APP_URL.toString()));
         driver.manage().window().maximize();
         return driver;
+    }
+
+    private FirefoxOptions setFirefoxOptions() {
+        FirefoxOptions options = new FirefoxOptions();
+        DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+        options.setAcceptInsecureCerts(true);
+        capabilities.setCapability("marionette", true);
+        return options.merge(capabilities);
     }
 
     private WebDriver instantiateRemoteWebDriver() {
@@ -130,10 +174,7 @@ public class DriverUtils {
     }
 
     public WebDriver instantiateMobileEmulatorDriver() {
-
-        String driverToBeLoaded = thisRun.getAsString(KEYS.OS_NAME.toString()).contains("Windows") ? "chromedriver_win.exe" : "chromedriver_mac";
-        System.setProperty("webdriver.chrome.driver", thisRun.getAsString(KEYS.TEST_RESOURCES.toString()) + "/" + driverToBeLoaded);
-
+        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver(setChromeOptions());
         driver.get(thisRun.getAsString(KEYS.APP_URL.toString()));
         return driver;
@@ -164,7 +205,7 @@ public class DriverUtils {
 
     private ChromeOptions setChromeOptions() {
         Map<String, String> mobileEmulation = new HashMap<>();
-        mobileEmulation.put("deviceName", "Pixel 2");
+        mobileEmulation.put("deviceName", thisRun.getAsString(KEYS.DEVICE_ID.name()));
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("mobileEmulation", mobileEmulation);
         options.addArguments(addChromeArguments());
@@ -183,13 +224,15 @@ public class DriverUtils {
                     return instantiateFireFoxDriver();
                 } else if (ProjectConstants.IE11.equals(browser)) {
                     return instantiateIE11Driver();
+                } else if (ProjectConstants.EDGE.equals(browser)) {
+                    return instantiateEdgeDriver();
                 } else {
                     throw new InvalidArgumentException("Invalid browser name ");
                 }
             case ProjectConstants.PLATFORM_MOBILITY:
                 if (ProjectConstants.PLATFORM_ANDROID.equals(thisRun.getAsString(KEYS.SUB_PLATFORM.name())))
                     return instantiateAndroidDriver();
-            case "mobileemulator":
+            case ProjectConstants.PLATFORM_EMULATOR:
                 return instantiateMobileEmulatorDriver();
             case "remotewebdriver":
                 return instantiateRemoteWebDriver();

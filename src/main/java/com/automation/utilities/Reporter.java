@@ -1,5 +1,6 @@
 package com.automation.utilities;
 
+import com.automation.helpers.KEYS;
 import net.masterthought.cucumber.Configuration;
 import net.masterthought.cucumber.ReportBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -13,16 +14,16 @@ import java.util.stream.Collectors;
 public class Reporter {
 
     private static Logger logger = LogManager.getLogger(Reporter.class.getName());
+    private static ThisRun thisRun = ThisRun.getInstance();
 
     public Reporter() {
 
     }
 
-    public static void main(String arg) {
+    public static void main(String jsonDirPath, String reportsDir) {
 
-        String reportsDir = arg;
         System.out.println(reportsDir);
-        File reportOutputDirectory = new File(reportsDir);
+        File reportOutputDirectory = new File(jsonDirPath);
 
         List<String> jsonReportFiles = getListOfJsonReports(reportOutputDirectory);
 
@@ -31,7 +32,7 @@ public class Reporter {
         }
 
         try {
-            Configuration configuration = createReportBuilderConfiguration(reportOutputDirectory);
+            Configuration configuration = createReportBuilderConfiguration(new File(reportsDir));
 
             ReportBuilder reportBuilder = new ReportBuilder(jsonReportFiles, configuration);
             reportBuilder.generateReports();
@@ -42,7 +43,13 @@ public class Reporter {
     }
 
     private static Configuration createReportBuilderConfiguration(File reportOutputDirectory) {
-        Configuration configuration = new Configuration(reportOutputDirectory, "Test Automation");
+        Configuration configuration = new Configuration(reportOutputDirectory, "Litmus Automation");
+
+        configuration.addClassifications("Operating System", thisRun.getAsString(KEYS.OS_NAME.name()));
+        configuration.addClassifications("Browser", thisRun.getAsString(KEYS.BROWSER.name()));
+        configuration.addClassifications("Platform", thisRun.getAsString(KEYS.PLATFORM.name()));
+        configuration.addClassifications("Sub Platform", thisRun.getAsString(KEYS.SUB_PLATFORM.name()));
+        configuration.addClassifications("Device Id/Name", thisRun.getAsString(KEYS.DEVICE_ID.name()));
         return configuration;
     }
 

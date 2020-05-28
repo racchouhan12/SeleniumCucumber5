@@ -2,6 +2,7 @@ package com.testautomation.test.pages;
 
 import com.automation.utilities.ThisRun;
 import com.google.common.base.Function;
+import com.testautomation.test.stepdefinitions.Runners.TestRunner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
@@ -13,10 +14,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.testautomation.test.stepdefinitions.Hooks;
 
 
-public abstract class Actions extends Hooks {
+public abstract class Actions extends TestRunner {
     protected ThisRun thisRun = ThisRun.getInstance();
     private final int DEFAULT_TIMEOUT = 50;
     private final long DEFAULT_POLLING_TIME = 1L;
