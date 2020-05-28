@@ -58,14 +58,10 @@ For Appium installation:
 
  ##  How to run Test:
 
- 1. testng.xml is placed in src/test/resources to maintain parallel running of scenarios count edit "dataproviderthreadcount" value in testng.xml.
- 2. To run specific scenarios use command : run=@foo mvn clean test (For MAC)
-    For Windows you might need to use
-    1. set run=@foo and not @foo1 (will run scenarios annotated with @foo and will skip annotated with @foo1)
-    2. set platform=desktop //possible options: desktop, mobility (default: desktop)
-    3. set subPlatform=android //possible options: android, ios required when platform = mobility (default: "")
-    4. set deviceId=1234443 //required when platform is mobility (default: "")
-    5. set browser=chrome  //possible options: chrome, firefox, ie11 (default: chrome)
-    6. mvn clean test/ mvn test
-  3. Formatted HTML report will be generated in reports/cucumber-html-reports  
-
+ 1. Maven command to run is mvn clean test -DsuiteXmlFile=[testngfilename.xml].
+ 2. There are three XMLs for desktop, mobile and emulator respectively in test/resources.
+ 3. Each XML has parameters inside it if platform, subPlatform, browser, deviceId, tags.
+ 4. For testngForWeb.xml we should change only tags, we can comment out the "test" that we dont want to execute.
+ 5. For testngForMobile we need to change only deviceId, subPlatform, tags, we can comment out the "test" that we dont want to execute.
+ 6. For testngForMobile we need to change only deviceId, tags, we can comment out the "test" that we dont want to execute.
+ 7. Right now for testngForMobile.xml, "data-provider-thread-count" at first line at should be 1.
