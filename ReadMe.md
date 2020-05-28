@@ -65,3 +65,4 @@ For Appium installation:
  5. For testngForMobile we need to change only deviceId, subPlatform, tags, we can comment out the "test" that we dont want to execute.
  6. For testngForMobile we need to change only deviceId, tags, we can comment out the "test" that we dont want to execute.
  7. Right now for testngForMobile.xml, "data-provider-thread-count" at first line at should be 1.
+
