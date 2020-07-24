@@ -57,8 +57,10 @@ public class DriverUtils {
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.setExperimentalOption("useAutomationExtension", false);
-        //options.addArguments("--headless");
-        //options.addArguments("--window-size=1920,1080");
+        if ("yes".equalsIgnoreCase(headless)) {
+            options.addArguments("--headless");
+            options.addArguments("--window-size=1920,1080");
+        }
         options.setPageLoadStrategy(PageLoadStrategy.NONE);
         options.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
         //options.addArguments("--disable-ipv6");
@@ -66,7 +68,9 @@ public class DriverUtils {
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("credentials_enable_service", false);
         prefs.put("profile.password_manager_enabled", false);
-
+        prefs.put("download.default_directory", thisRun.getAsString(KEYS.DOWNLOADS_PATH.name()));
+        prefs.put("profile.default_content_setting_values.automatic_downloads", 1);
+        prefs.put("profile.default_content_settings.popups", 0);
         options.setExperimentalOption("prefs", prefs);
         return options;
     }
@@ -135,8 +139,18 @@ public class DriverUtils {
 
     private FirefoxOptions setFirefoxOptions() {
         FirefoxOptions options = new FirefoxOptions();
+        FirefoxProfile profile = new FirefoxProfile();
+        profile.setPreference("browser.download.dir", thisRun.getAsString(KEYS.DOWNLOADS_PATH.name()));
+        profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        profile.setPreference("browser.download.useDownloadDir", true);
+        profile.setPreference("browser.download.folderList", 2);
         DesiredCapabilities capabilities = DesiredCapabilities.firefox();
         options.setAcceptInsecureCerts(true);
+        if ("yes".equalsIgnoreCase(headless)) {
+            options.addArguments("--headless");
+        }
+        options.setProfile(profile);
         capabilities.setCapability("marionette", true);
         return options.merge(capabilities);
     }
