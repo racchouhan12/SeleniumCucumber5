@@ -50,6 +50,8 @@ public class Reporter {
         configuration.addClassifications("Platform", thisRun.getAsString(KEYS.PLATFORM.name()));
         configuration.addClassifications("Sub Platform", thisRun.getAsString(KEYS.SUB_PLATFORM.name()));
         configuration.addClassifications("Device Id/Name", thisRun.getAsString(KEYS.DEVICE_ID.name()));
+        configuration.setSortingMethod(SortingMethod.ALPHABETICAL);
+        configuration.addReducingMethod(ReducingMethod.MERGE_FEATURES_BY_ID);
         return configuration;
     }
 
